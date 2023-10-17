@@ -132,6 +132,18 @@ public class TentaController extends Application implements Initializable {
             }
         });
     }
+    public void tillBaka(){
+        if (currentFrågaIndex > 0) {
+            currentFrågaIndex--;
+            setText();
+        }
+    }
+    public void setNästaFråga(){
+        if (currentFrågaIndex < frågorLista.length - 1) {
+            currentFrågaIndex++;
+            setText();
+        }
+    }
     public void showWrongAnswer(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Fel svar");
@@ -160,10 +172,10 @@ public class TentaController extends Application implements Initializable {
         setSvarAlternativText3(currentFråga.getAlternativText()[2]);
         setSvarAlternativText4(currentFråga.getAlternativText()[3]);
         setFrågaNR("Fråga " + (currentFrågaIndex + 1) + " av " + frågorLista.length);
-        setKnappSvar1("1");
-        setKnappSvar2("2");
-        setKnappSvar3("3");
-        setKnappSvar4("4");
+        setKnappSvar1("A");
+        setKnappSvar2("B");
+        setKnappSvar3("C");
+        setKnappSvar4("D");
 
     }
 

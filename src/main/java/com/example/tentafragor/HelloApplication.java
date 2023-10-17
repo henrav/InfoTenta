@@ -11,7 +11,7 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new    FXMLLoader(HelloApplication.class.getResource("Tenta.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1920, 1080);
+        Scene scene = new Scene(fxmlLoader.load());
         TentaController controller = fxmlLoader.getController();
         stage.setTitle("Hello!");
         stage.setScene(scene);
