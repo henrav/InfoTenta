@@ -154,6 +154,33 @@ public class TentaController extends Application implements Initializable {
         });
         alert.showAndWait();
     }
+    public void seeAnswer(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Förklaring");
+        alert.setHeaderText("Rätta Svaret är: " + convertnrIntoABC(currentFråga));
+        alert.setContentText(currentFråga.getExplanation());
+        alert.showAndWait();
+    }
+    public String convertnrIntoABC(Frågor fråga){
+        int a = currentFråga.getCorrectAnswer();
+        if (a == 1){
+            setKnappSvar1("A");
+            return "A";
+        }
+        if (a == 2){
+            setKnappSvar2("B");
+            return "B";
+        }
+        if (a == 3){
+            setKnappSvar3("C");
+            return "C";
+        }
+        if (a == 4){
+            setKnappSvar4("D");
+            return "D";
+        }
+        return null;
+    }
 
 
     public void nästaFråga(){
@@ -193,7 +220,7 @@ public class TentaController extends Application implements Initializable {
                         "B. Keeping the number of system users with access to a minimum",
                         "C. Granting users only the minimum privileges needed to accomplish assigned work tasks",
                         "D. Designing applications that do not have high levels of privilege"},
-                2,
+                3,
                 "The definition of the principle of least privilege is granting users only the minimum privileges needed to accomplish assigned work tasks.");
         frågorLista[1] = new Frågor("2. What is the process of assigning groups of tasks to different users to prevent collusion and avoid conflicts of interest?",
                 new String[]{

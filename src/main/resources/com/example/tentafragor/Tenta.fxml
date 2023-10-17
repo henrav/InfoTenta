@@ -29,19 +29,19 @@
             <RowConstraints minHeight="0.0" prefHeight="1.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <TextArea fx:id="SvarAlternativText3" prefHeight="120.0" prefWidth="461.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-            <TextArea fx:id="SvarAlternativText1" prefHeight="78.0" prefWidth="621.0" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-            <TextArea fx:id="SvarAlternativText4" prefHeight="78.0" prefWidth="621.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-            <TextArea fx:id="SvarAlternativText2" prefHeight="78.0" prefWidth="621.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+            <TextArea fx:id="SvarAlternativText3" prefHeight="120.0" prefWidth="461.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+            <TextArea fx:id="SvarAlternativText1" prefHeight="78.0" prefWidth="621.0" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+            <TextArea fx:id="SvarAlternativText4" prefHeight="78.0" prefWidth="621.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+            <TextArea fx:id="SvarAlternativText2" prefHeight="78.0" prefWidth="621.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
             <TextArea fx:id="FrågaText" prefHeight="200.0" prefWidth="577.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <Button fx:id="KnappSvar1" mnemonicParsing="false" text="OK" GridPane.columnIndex="3" GridPane.rowIndex="3" />
             <Button fx:id="KnappSvar2" mnemonicParsing="false" text="OK" GridPane.columnIndex="3" GridPane.rowIndex="4" />
             <Button fx:id="KnappSvar3" mnemonicParsing="false" text="OK" GridPane.columnIndex="3" GridPane.rowIndex="5" />
             <Button fx:id="KnappSvar4" mnemonicParsing="false" text="OK" GridPane.columnIndex="3" GridPane.rowIndex="6" />
-            <Button fx:id="NästaFråga" mnemonicParsing="false" text="Nästa Fråga" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5"
-                    onAction="#setNästaFråga"/>
-            <Button fx:id="Tillbaka" mnemonicParsing="false" text="Tillbaka" GridPane.columnIndex="3" onAction="#tillBaka" />
+            <Button fx:id="NästaFråga" mnemonicParsing="false" onAction="#setNästaFråga" text="Nästa Fråga" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+            <Button fx:id="Tillbaka" mnemonicParsing="false" onAction="#tillBaka" text="Tillbaka" GridPane.columnIndex="3" />
             <TextField fx:id="FrågaNR" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="252.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+            <Button fx:id="SeeRättSvar" mnemonicParsing="false" onAction="#seeAnswer" text="See Rätt Svar" GridPane.columnIndex="3" GridPane.rowIndex="1" />
          </children>
       </GridPane>
    </children>
