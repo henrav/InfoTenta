@@ -3,10 +3,7 @@ package com.example.tentafragor;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -44,7 +41,12 @@ public class TentaController extends Application implements Initializable {
 
     private int currentFrågaIndex;
 
-    private Frågor[] frågorLista = new Frågor[150];
+    private Frågor[] frågorLista = new Frågor[143];
+    private int poäng = 0;
+    @FXML
+    private Button SeeRättSvar;
+    @FXML
+    private Label Poäng;
 
 
     public void setFrågaText(String text) {
@@ -94,11 +96,16 @@ public class TentaController extends Application implements Initializable {
     public void setTillbaka(String text) {
         Tillbaka.setText(text);
     }
+    public void poäng(){
+        poäng++;
+        Poäng.setText("Poäng: " + poäng + "/" + frågorLista.length);
+    }
     public void setKnappar(){
         KnappSvar1.setOnAction(actionEvent -> {
             if (currentFråga.getCorrectAnswer() == 1) {
                 System.out.println("Rätt svar");
                 nästaFråga();
+                poäng();
             } else {
                 System.out.println("Fel svar");
                 showWrongAnswer();
@@ -108,6 +115,7 @@ public class TentaController extends Application implements Initializable {
             if (currentFråga.getCorrectAnswer() == 2) {
                 System.out.println("Rätt svar");
                 nästaFråga();
+                poäng();
             } else {
                 System.out.println("Fel svar");
                 showWrongAnswer();
@@ -117,6 +125,7 @@ public class TentaController extends Application implements Initializable {
             if (currentFråga.getCorrectAnswer() == 3) {
                 System.out.println("Rätt svar");
                 nästaFråga();
+                poäng();
             } else {
                 System.out.println("Fel svar");
                 showWrongAnswer();
@@ -126,6 +135,7 @@ public class TentaController extends Application implements Initializable {
             if (currentFråga.getCorrectAnswer() == 4) {
                 System.out.println("Rätt svar");
                 nästaFråga();
+                poäng();
             } else {
                 System.out.println("Fel svar");
                 showWrongAnswer();
@@ -1453,12 +1463,10 @@ public class TentaController extends Application implements Initializable {
                 "C. Several big data processing models exist that illustrate how big data can be processed by parallel processors reaching into the thousands of servers.");
         //kapitel 3 Under
 
-
-
-
-        currentFrågaIndex = 0;
+        Poäng.setText("Poäng: " + poäng + "/" + frågorLista.length);
         setText();
         setKnappar();
 
     }
+
 }

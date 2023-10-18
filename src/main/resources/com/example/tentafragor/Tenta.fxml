@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -42,6 +43,7 @@
             <Button fx:id="Tillbaka" mnemonicParsing="false" onAction="#tillBaka" text="Tillbaka" GridPane.columnIndex="3" />
             <TextField fx:id="FrågaNR" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="252.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
             <Button fx:id="SeeRättSvar" mnemonicParsing="false" onAction="#seeAnswer" text="See Rätt Svar" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+            <Label fx:id="Poäng" text="Label" GridPane.columnIndex="3" GridPane.halignment="RIGHT" />
          </children>
       </GridPane>
    </children>
