@@ -212,10 +212,10 @@ public class TentaController extends Application implements Initializable {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Grattis");
             alert.setHeaderText("Du har klarat testet");
-            alert.setContentText("Du fick " + poäng + " poäng av " + frågorLista.size());
+            alert.setContentText("Du fick " + poäng + " poäng av " + frågorLista.size() +": Tryck på OK för att göra om frågorna du fucka upp");
             omStart();
             alert.onCloseRequestProperty().setValue(event -> {
-                setTextWrongAnswers();
+                setText();
             });
             alert.showAndWait();
         }
@@ -223,7 +223,7 @@ public class TentaController extends Application implements Initializable {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Grattis");
             alert.setHeaderText("Du har klarat testet");
-            alert.setContentText("Du fick " + poäng + " poäng av " + frågorLista.size());
+            alert.setContentText("Woaw du har klarat alla frågor");
             alert.onCloseRequestProperty().setValue(event -> {
                 System.exit(0);
             });
@@ -236,8 +236,7 @@ public class TentaController extends Application implements Initializable {
         frågorLista.addAll(WrongQuestions);
         poäng = 0;
         Poäng.setText("Poäng: " + poäng + "/" + frågorLista.size());
-        WrongQuestions2.clear();
-        WrongQuestions2.addAll(WrongQuestions);
+        shuffleFrågor(frågorLista);
         WrongQuestions.clear();
     }
 
@@ -256,20 +255,6 @@ public class TentaController extends Application implements Initializable {
         setKnappSvar4("D");
 
     }
-    public void setTextWrongAnswers(){
-        currentFråga = WrongQuestions2.get(currentFrågaIndex);
-        setFrågaText(currentFråga.getQuestionText());
-        setSvarAlternativText1(currentFråga.getAlternativText()[0]);
-        setSvarAlternativText2(currentFråga.getAlternativText()[1]);
-        setSvarAlternativText3(currentFråga.getAlternativText()[2]);
-        setSvarAlternativText4(currentFråga.getAlternativText()[3]);
-        setFrågaNR("Fråga " + (currentFrågaIndex + 1) + " av " + WrongQuestions2.size());
-        setKnappSvar1("A");
-        setKnappSvar2("B");
-        setKnappSvar3("C");
-        setKnappSvar4("D");
-    }
-
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -359,6 +344,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Using an alternate site after a disaster"},
                 3,
                 "Use of an alternate site after a disaster falls under the recovery primary security category."));
+        /*
 
         frågorLista.add(new Frågor("What is the most important step the IT department should take when an employee is fired?",
                 new String[]{
@@ -694,7 +680,7 @@ public class TentaController extends Application implements Initializable {
                         "C. Makes extensive use of baselines and guidelines",
                         "D. Completely aligns with the mission, objectives, culture, and nature of the business"
                 },
-                3, // Correct answer is D (Completely aligns with the mission, objectives, culture, and nature of the business)
+                4, // Correct answer is D (Completely aligns with the mission, objectives, culture, and nature of the business)
                 "D. A security policy must be in alignment with the mission, objectives, nature, and culture of a business. Organizational policies are not based on best practices."));
 
         frågorLista.add(new Frågor("Which of the following best describes a federated relationship?",
@@ -784,7 +770,7 @@ public class TentaController extends Application implements Initializable {
                         "C. Meet all CEU requirements for this certification",
                         "D. Provide competent and diligent service"
                 },
-                3, // Correct answer is D (Provide competent and diligent service)
+                4, // Correct answer is D (Provide competent and diligent service)
                 "D. Provide competent and diligent service to principles is the third canon of the (ISC)2 Code of Ethics."));
 
         frågorLista.add(new Frågor("What is a service pack?",
@@ -1670,14 +1656,18 @@ public class TentaController extends Application implements Initializable {
                 "C. Several big data processing models exist that illustrate how big data can be processed by parallel processors reaching into the thousands of servers."));
         //kapitel 3 Under
 
+         */
+
+
+
 
         Poäng.setText("Poäng: " + poäng + "/" + frågorLista.size());
-        shuffleFrågor();
+        shuffleFrågor(frågorLista);
         setText();
         setKnappar();
 
     }
-    public void shuffleFrågor(){
+    public void shuffleFrågor(List<Frågor> frågorLista){
         Collections.shuffle(frågorLista);
     }
 
