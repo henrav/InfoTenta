@@ -7,7 +7,6 @@
     <list default="true" id="8fa30d84-84dc-4924-8aee-cd5043fa390b" name="Changes" comment="kör HelloApplication">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/tentafragor/TentaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/tentafragor/TentaController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/tentafragor/Tenta.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/tentafragor/Tenta.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +84,7 @@
       <workItem from="1697548600772" duration="2000" />
       <workItem from="1697549618920" duration="2670000" />
       <workItem from="1697552421299" duration="1379000" />
-      <workItem from="1697626163911" duration="794000" />
+      <workItem from="1697626163911" duration="10579000" />
     </task>
     <task id="LOCAL-00001" summary="kör HelloApplication">
       <created>1697549694905</created>
@@ -115,7 +114,14 @@
       <option name="project" value="LOCAL" />
       <updated>1697552111285</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="kör HelloApplication">
+      <created>1697627203877</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1697627203877</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -6,7 +6,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class TentaController extends Application implements Initializable {
@@ -41,12 +44,14 @@ public class TentaController extends Application implements Initializable {
 
     private int currentFrågaIndex;
 
-    private Frågor[] frågorLista = new Frågor[143];
+    private ArrayList<Frågor> frågorLista = new ArrayList<>();
     private int poäng = 0;
     @FXML
     private Button SeeRättSvar;
     @FXML
     private Label Poäng;
+    private ArrayList<Frågor> WrongQuestions = new ArrayList<>();
+    private ArrayList<Frågor> WrongQuestions2= new ArrayList<>();
 
 
     public void setFrågaText(String text) {
@@ -98,14 +103,14 @@ public class TentaController extends Application implements Initializable {
     }
     public void poäng(){
         poäng++;
-        Poäng.setText("Poäng: " + poäng + "/" + frågorLista.length);
+        Poäng.setText("Poäng: " + poäng + "/" + frågorLista.size());
     }
     public void setKnappar(){
         KnappSvar1.setOnAction(actionEvent -> {
             if (currentFråga.getCorrectAnswer() == 1) {
                 System.out.println("Rätt svar");
-                nästaFråga();
                 poäng();
+                nästaFråga();
             } else {
                 System.out.println("Fel svar");
                 showWrongAnswer();
@@ -114,8 +119,8 @@ public class TentaController extends Application implements Initializable {
         KnappSvar2.setOnAction(actionEvent -> {
             if (currentFråga.getCorrectAnswer() == 2) {
                 System.out.println("Rätt svar");
-                nästaFråga();
                 poäng();
+                nästaFråga();
             } else {
                 System.out.println("Fel svar");
                 showWrongAnswer();
@@ -124,8 +129,8 @@ public class TentaController extends Application implements Initializable {
         KnappSvar3.setOnAction(actionEvent -> {
             if (currentFråga.getCorrectAnswer() == 3) {
                 System.out.println("Rätt svar");
-                nästaFråga();
                 poäng();
+                nästaFråga();
             } else {
                 System.out.println("Fel svar");
                 showWrongAnswer();
@@ -134,8 +139,8 @@ public class TentaController extends Application implements Initializable {
         KnappSvar4.setOnAction(actionEvent -> {
             if (currentFråga.getCorrectAnswer() == 4) {
                 System.out.println("Rätt svar");
-                nästaFråga();
                 poäng();
+                nästaFråga();
             } else {
                 System.out.println("Fel svar");
                 showWrongAnswer();
@@ -149,7 +154,7 @@ public class TentaController extends Application implements Initializable {
         }
     }
     public void setNästaFråga(){
-        if (currentFrågaIndex < frågorLista.length - 1) {
+        if (currentFrågaIndex < frågorLista.size() - 1) {
             currentFrågaIndex++;
             setText();
         }
@@ -160,9 +165,13 @@ public class TentaController extends Application implements Initializable {
         alert.setHeaderText("Du svarade fel");
         alert.setContentText("rätt svar är: " + currentFråga.getCorrectAnswer() + ": " + currentFråga.getExplanation());
         alert.setOnCloseRequest(event -> {
+            addWrongQuestionsToList();
             nästaFråga();
         });
         alert.showAndWait();
+    }
+    public void addWrongQuestionsToList(){
+        WrongQuestions.add(currentFråga);
     }
     public void seeAnswer(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -194,26 +203,70 @@ public class TentaController extends Application implements Initializable {
 
 
     public void nästaFråga(){
-        if (currentFrågaIndex < frågorLista.length - 1) {
+        if (currentFrågaIndex < frågorLista.size() - 1) {
             currentFrågaIndex++;
             setText();
         }
+        else if (currentFrågaIndex == frågorLista.size() - 1 && WrongQuestions.size() > 0){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Grattis");
+            alert.setHeaderText("Du har klarat testet");
+            alert.setContentText("Du fick " + poäng + " poäng av " + frågorLista.size());
+            omStart();
+            alert.onCloseRequestProperty().setValue(event -> {
+                setTextWrongAnswers();
+            });
+            alert.showAndWait();
+        }
+        else {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Grattis");
+            alert.setHeaderText("Du har klarat testet");
+            alert.setContentText("Du fick " + poäng + " poäng av " + frågorLista.size());
+            alert.onCloseRequestProperty().setValue(event -> {
+                System.exit(0);
+            });
+            alert.showAndWait();
+        }
+    }
+    public void omStart(){
+        currentFrågaIndex = 0;
+        frågorLista.clear();
+        frågorLista.addAll(WrongQuestions);
+        poäng = 0;
+        Poäng.setText("Poäng: " + poäng + "/" + frågorLista.size());
+        WrongQuestions2.clear();
+        WrongQuestions2.addAll(WrongQuestions);
+        WrongQuestions.clear();
     }
 
 
     public void setText(){
-        currentFråga = frågorLista[currentFrågaIndex];
+        currentFråga = frågorLista.get(currentFrågaIndex);
         setFrågaText(currentFråga.getQuestionText());
         setSvarAlternativText1(currentFråga.getAlternativText()[0]);
         setSvarAlternativText2(currentFråga.getAlternativText()[1]);
         setSvarAlternativText3(currentFråga.getAlternativText()[2]);
         setSvarAlternativText4(currentFråga.getAlternativText()[3]);
-        setFrågaNR("Fråga " + (currentFrågaIndex + 1) + " av " + frågorLista.length);
+        setFrågaNR("Fråga " + (currentFrågaIndex + 1) + " av " + frågorLista.size());
         setKnappSvar1("A");
         setKnappSvar2("B");
         setKnappSvar3("C");
         setKnappSvar4("D");
 
+    }
+    public void setTextWrongAnswers(){
+        currentFråga = WrongQuestions2.get(currentFrågaIndex);
+        setFrågaText(currentFråga.getQuestionText());
+        setSvarAlternativText1(currentFråga.getAlternativText()[0]);
+        setSvarAlternativText2(currentFråga.getAlternativText()[1]);
+        setSvarAlternativText3(currentFråga.getAlternativText()[2]);
+        setSvarAlternativText4(currentFråga.getAlternativText()[3]);
+        setFrågaNR("Fråga " + (currentFrågaIndex + 1) + " av " + WrongQuestions2.size());
+        setKnappSvar1("A");
+        setKnappSvar2("B");
+        setKnappSvar3("C");
+        setKnappSvar4("D");
     }
 
 
@@ -224,65 +277,69 @@ public class TentaController extends Application implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        frågorLista[0] = new Frågor("1. What is the definition of the principle of least privilege?",
+        frågorLista.add(0, new Frågor("1. What is the definition of the principle of least privilege?",
                 new String[]{
                         "A. Allowing all users full control over a network to keep administrative responsibilities to a minimum",
                         "B. Keeping the number of system users with access to a minimum",
                         "C. Granting users only the minimum privileges needed to accomplish assigned work tasks",
                         "D. Designing applications that do not have high levels of privilege"},
                 3,
-                "The definition of the principle of least privilege is granting users only the minimum privileges needed to accomplish assigned work tasks.");
-        frågorLista[1] = new Frågor("2. What is the process of assigning groups of tasks to different users to prevent collusion and avoid conflicts of interest?",
+                "The definition of the principle of least privilege is granting users only the minimum privileges needed to accomplish assigned work tasks."));
+        frågorLista.add(1, new Frågor("2. What is the process of assigning groups of tasks to different users to prevent collusion and avoid conflicts of " +
+                "interest?",
                 new String[]{
                         "A. Principle of least privilege",
                         "B. Separation of duties",
                         "C. Mandatory access control",
                         "D. Integrity assurance"},
                 2,
-                "Separation of duties is the process of assigning groups of tasks to different users to prevent collusion and to avoid conflicts of interest. The principle of least privilege is assigning users the minimal amount of access required to accomplish their work tasks.");
-        frågorLista[2] = new Frågor("3. To prevent any one person from having too much control or power, or performing fraudulent acts, which of the following solutions should not be implemented?",
+                "Separation of duties is the process of assigning groups of tasks to different users to prevent collusion and to avoid conflicts of interest. The principle of least privilege is assigning users the minimal amount of access required to accomplish their work tasks."));
+
+        frågorLista.add(2, new Frågor("3. To prevent any one person from having too much control or power, or performing fraudulent acts, which of the " +
+                "following solutions should not be implemented?",
                 new String[]{
                         "A. M of N control",
                         "B. Job rotation",
                         "C. Multiple key pairs",
                         "D. Separation of duties"},
                 2,
-                "Job rotation isn't appropriate because one person is still in charge of a particular position. M of N control, multiple key pairs, and separation of duties should be used to prevent a single person from compromising an entire system.");
+                "Job rotation isn't appropriate because one person is still in charge of a particular position. M of N control, multiple key pairs, and separation of duties should be used to prevent a single person from compromising an entire system."));
 
-        frågorLista[3] = new Frågor("4. What is the primary goal of risk management?",
+        frågorLista.add(3, new Frågor("4. What is the primary goal of risk management?",
                 new String[]{
                         "A. Reduce risk to an acceptable level",
                         "B. Remove all risks from an environment",
                         "C. Minimize security cost expenditures",
                         "D. Assign responsibilities to job roles"},
                 1,
-                "The correct answer is to reduce or mitigate risk to an acceptable level. It's virtually impossible to remove all risks from an environment. It may be a goal of upper management in general to minimize security cost. Assigning responsibilities to job roles might be accomplished by the department heads.");
+                "The correct answer is to reduce or mitigate risk to an acceptable level. It's virtually impossible to remove all risks from an environment. It may be a goal of upper management in general to minimize security cost. Assigning responsibilities to job roles might be accomplished by the department heads."));
 
-        frågorLista[4] = new Frågor("5. Which of the following best describes the use of a PIN number?",
+        frågorLista.add(4, new Frågor("5. Which of the following best describes the use of a PIN number?",
                 new String[]{
                         "A. Authentication",
                         "B. Authorization",
                         "C. Auditing",
                         "D. Access control"},
                 1,
-                "A PIN provides authentication. It is something you know.");
+                "A PIN provides authentication. It is something you know."));
 
-        frågorLista[5] = new Frågor("6. Nonrepudiation ensures which of the following?",
+        frågorLista.add(5, new Frågor("6. Nonrepudiation ensures which of the following?",
                 new String[]{
                         "A. That strong passwords are always used",
                         "B. The accounting of the user actions",
                         "C. That the sender cannot deny their actions",
                         "D. The confidentiality of the database"},
                 3,
-                "When nonrepudiation is used as a security technique, a sender cannot deny sending a message.");
-        frågorLista[6] = new Frågor("7. Which item is not part of the primary security categories?",
+                "When nonrepudiation is used as a security technique, a sender cannot deny sending a message."));
+        frågorLista.add(6, new Frågor("7. Which item is not part of the primary security categories?",
                 new String[]{
                         "A. Prevention",
                         "B. Encryption",
                         "C. Detection",
                         "D. Recovery"},
                 2,
-                "Although encryption is a security technique, it falls under the prevention security category.");
+                "Although encryption is a security technique, it falls under the prevention security category."));
+        /*
 
         frågorLista[7] = new Frågor("8. Which of the following is a nontechnical means of enforcing security?",
                 new String[]{
@@ -700,7 +757,7 @@ public class TentaController extends Application implements Initializable {
                         "D. In a simulator"},
                 2, // Correct answer is B (In a sandbox)
                 "B. A sandbox environment, which resembles a production environment, is a location that patches and service packs should be tested prior to distribution to a production network.");
-        frågorLista[56] = new Frågor("57. What is a typical commercial or business information classification scheme?",
+        frågorLista[54] = new Frågor("55. What is a typical commercial or business information classification scheme?",
                 new String[]{
                         "A. Unclassified, sensitive but unclassified, secret, and top secret",
                         "B. Unclassified, business casual, confidential",
@@ -709,7 +766,7 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (Unclassified, sensitive but unclassified, secret, and top secret)
                 "A. A typical commercial or business information classification scheme includes classifications such as unclassified, sensitive but unclassified, secret, and top secret.");
 
-        frågorLista[57] = new Frågor("58. If subjects receive a clearance, what do objects receive?",
+        frågorLista[55] = new Frågor("56. If subjects receive a clearance, what do objects receive?",
                 new String[]{
                         "A. Data Tag",
                         "B. Mandatory Access Control label",
@@ -718,7 +775,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Mandatory Access Control label)
                 "B. In mandatory access control (MAC) systems, objects are labeled with Mandatory Access Control labels, and subjects are assigned clearances.");
 
-        frågorLista[58] = new Frågor("59. Which of the following best describes an endpoint device?",
+        frågorLista[56] = new Frågor("57. Which of the following best describes an endpoint device?",
                 new String[]{
                         "A. Router",
                         "B. Computer printer",
@@ -727,7 +784,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Computer printer)
                 "B. Any device that terminates a network connection may be classified as an endpoint device. In this case, a computer printer is an endpoint device because nothing follows it on the network.");
 
-        frågorLista[59] = new Frågor("60. Which of the following is part of the business continuity plan?",
+        frågorLista[57] = new Frågor("58. Which of the following is part of the business continuity plan?",
                 new String[]{
                         "A. The recovery downtime objective",
                         "B. The restoration of accounting data into databases",
@@ -736,7 +793,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Recovery point objective)
                 "C. The recovery point objective (RPO) is part of a business continuity plan.");
 
-        frågorLista[60] = new Frågor("61. Which of the following best describes a disaster recovery plan?",
+        frågorLista[58] = new Frågor("59. Which of the following best describes a disaster recovery plan?",
                 new String[]{
                         "A. Makes use of probability analysis",
                         "B. Uses the Business Information Plan to determine procedures",
@@ -745,7 +802,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Documents procedures to restore equipment and facilities to the condition they were in prior to the disaster)
                 "C. A disaster recovery plan documents the procedures required to restore equipment and facilities back to the condition they were in prior to the disaster.");
 
-        frågorLista[61] = new Frågor("62. Which of the following best describes maximum tolerable downtime?",
+        frågorLista[59] = new Frågor("60. Which of the following best describes maximum tolerable downtime?",
                 new String[]{
                         "A. The amount of time a business process may be off-line before the viability of the organization is in severe jeopardy",
                         "B. The point at which data recovery should begin",
@@ -753,7 +810,7 @@ public class TentaController extends Application implements Initializable {
                         "D. The time required to restore data from a backup"},
                 1, // Correct answer is A (The amount of time a business process may be off-line before the viability of the organization is in severe jeopardy)
                 "A. Maximum tolerable downtime is the amount of time a business process may be off-line before the viability of the organization is in severe jeopardy.");
-        frågorLista[62] = new Frågor("63. What is a primary goal of security in an organization?",
+        frågorLista[60] = new Frågor("61. What is a primary goal of security in an organization?",
                 new String[]{
                         "A. Eliminate risk",
                         "B. Mitigate the possibility of the use of malware",
@@ -762,7 +819,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Enforce and maintain the AIC objectives)
                 "C. Enforcing and maintaining the AIC (Availability, Integrity, and Confidentiality) objectives is a primary goal of security. Options A, B, and D are not primary goals.");
 
-        frågorLista[63] = new Frågor("64. Which of the following provides the best description of risk reduction?",
+        frågorLista[61] = new Frågor("62. Which of the following provides the best description of risk reduction?",
                 new String[]{
                         "A. Altering elements of the enterprise in response to a risk analysis",
                         "B. Mitigating risk to the enterprise at any cost",
@@ -771,7 +828,7 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (Altering elements of the enterprise in response to a risk analysis)
                 "A. Risk reduction involves altering elements of the enterprise in response to a risk analysis to minimize the ability of a threat to exploit a vulnerability. Options B, C, and D do not accurately describe risk reduction.");
 
-        frågorLista[64] = new Frågor("65. Which group represents the most likely source of an asset being lost through inappropriate computer use?",
+        frågorLista[62] = new Frågor("63. Which group represents the most likely source of an asset being lost through inappropriate computer use?",
                 new String[]{
                         "A. Crackers",
                         "B. Employees",
@@ -780,16 +837,16 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Employees)
                 "B. The most likely source of an asset being lost through inappropriate computer use is employees. Options A, C, and D refer to external threats.");
 
-        frågorLista[65] = new Frågor("66. Which of the following statements is not accurate?",
+        frågorLista[63] = new Frågor("64. Which of the following statements is not accurate?",
                 new String[]{
                         "A. Risk is identified and measured by performing a risk analysis.",
                         "B. Risk is controlled through the application of safeguards and countermeasures.",
                         "C. Risk is managed by periodically reviewing the risk and taking responsible actions based on the risk.",
                         "D. All risks can be totally eliminated through risk management."},
-                3, // Correct answer is D (All risks can be totally eliminated through risk management)
+                4, // Correct answer is D (All risks can be totally eliminated through risk management)
                 "D. Not all risks can be totally eliminated through risk management. Options A, B, and C are accurate statements about risk.");
 
-        frågorLista[66] = new Frågor("67. Which option most accurately defines a threat?",
+        frågorLista[64] = new Frågor("65. Which option most accurately defines a threat?",
                 new String[]{
                         "A. Any vulnerability in an information technology system",
                         "B. Protective controls",
@@ -798,7 +855,7 @@ public class TentaController extends Application implements Initializable {
                 4, // Correct answer is D (Possibility for a source to exploit a specific vulnerability)
                 "D. A threat is defined as the possibility for a source to exploit a specific vulnerability. Options A, B, and C do not accurately define a threat.");
 
-        frågorLista[67] = new Frågor("68. Which most accurately describes a safeguard?",
+        frågorLista[65] = new Frågor("66. Which most accurately describes a safeguard?",
                 new String[]{
                         "A. Potential for a source to exploit a categorized vulnerability",
                         "B. Controls put in place to provide some amount of protection for an asset",
@@ -807,7 +864,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Controls put in place to provide some amount of protection for an asset)
                 "B. A safeguard is a control put in place to provide some amount of protection for an asset. Options A, C, and D do not accurately describe a safeguard.");
 
-        frågorLista[68] = new Frågor("69. Which of the following choices is the most accurate description of a countermeasure?",
+        frågorLista[66] = new Frågor("67. Which of the following choices is the most accurate description of a countermeasure?",
                 new String[]{
                         "A. Any event with the potential to harm an information system through unauthorized access",
                         "B. Controls put in place as a result of a risk analysis",
@@ -815,7 +872,7 @@ public class TentaController extends Application implements Initializable {
                         "D. The company resource that could be lost due to an accident"},
                 2, // Correct answer is B (Controls put in place as a result of a risk analysis)
                 "B. A countermeasure is a control put in place as a result of a risk analysis to mitigate risk. Options A, C, and D do not accurately define a countermeasure.");
-        frågorLista[69] = new Frågor("70. Which most closely depicts the difference between qualitative and quantitative risk analysis?",
+        frågorLista[67] = new Frågor("68. Which most closely depicts the difference between qualitative and quantitative risk analysis?",
                 new String[]{
                         "A. A quantitative risk analysis does not use the hard cost of losses; a qualitative risk analysis does.",
                         "B. A quantitative risk analysis makes use of real numbers.",
@@ -824,7 +881,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (A quantitative risk analysis makes use of real numbers)
                 "B. Quantitative risk analysis involves using real numbers, whereas qualitative risk analysis does not rely on hard cost losses. Option A is incorrect as it misrepresents the difference. Option C is incorrect as it confuses qualitative analysis results with quantitative analysis. Option D is incorrect, as quantitative risk analysis can be automated.");
 
-        frågorLista[70] = new Frågor("71. Which choice is not a description of a control?",
+        frågorLista[68] = new Frågor("69. Which choice is not a description of a control?",
                 new String[]{
                         "A. Detective controls uncover attacks and prompt the action of preventative or corrective controls.",
                         "B. Controls perform as the countermeasures for threats.",
@@ -833,7 +890,7 @@ public class TentaController extends Application implements Initializable {
                 4, // Correct answer is D (Corrective controls always reduce the likelihood of a premeditated attack)
                 "D. Corrective controls are designed to stop an existing attack or correct an issue but do not necessarily reduce the likelihood of a premeditated attack. Options A, B, and C accurately describe controls.");
 
-        frågorLista[71] = new Frågor("72. What is the main advantage of using a quantitative impact analysis over a qualitative impact analysis?",
+        frågorLista[69] = new Frågor("70. What is the main advantage of using a quantitative impact analysis over a qualitative impact analysis?",
                 new String[]{
                         "A. A qualitative impact analysis identifies areas that require immediate improvement",
                         "B. A qualitative impact analysis provides a rationale for determining the effect of security controls",
@@ -842,7 +899,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (A quantitative impact analysis makes a cost-benefit analysis simple)
                 "C. The main advantage of using a quantitative impact analysis over a qualitative impact analysis is that it makes a cost-benefit analysis simple. Options A, B, and D do not represent the main advantage.");
 
-        frågorLista[72] = new Frågor("73. Which choice is not a common means of gathering information when performing a risk analysis?",
+        frågorLista[70] = new Frågor("71. Which choice is not a common means of gathering information when performing a risk analysis?",
                 new String[]{
                         "A. Distributing a multi-page form",
                         "B. Utilizing automated risk polling tools",
@@ -851,7 +908,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Interviewing fired employees)
                 "C. Interviewing fired employees is not a common means of gathering information when performing a risk analysis. Options A, B, and D are common techniques.");
 
-        frågorLista[73] = new Frågor("74. Which choice is usually the most-used criteria to determine the classification of an information object?",
+        frågorLista[71] = new Frågor("72. Which choice is usually the most-used criteria to determine the classification of an information object?",
                 new String[]{
                         "A. Useful life",
                         "B. Value",
@@ -860,7 +917,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Value)
                 "B. The most commonly used criterion to determine the classification of an information object is its value. Options A, C, and D are less commonly used criteria.");
 
-        frågorLista[74] = new Frågor("75. What is the prime objective of risk management?",
+        frågorLista[72] = new Frågor("73. What is the prime objective of risk management?",
                 new String[]{
                         "A. Reduce risk to a level tolerable by the organization",
                         "B. Reduce all risks without respect to cost to the organization",
@@ -869,7 +926,7 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (Reduce risk to a level tolerable by the organization)
                 "A. The prime objective of risk management is to reduce risk to a level tolerable by the organization. Option B is incorrect as it is not practical to reduce all risks without regard to cost. Option C is incorrect as it represents one treatment option, not the prime objective. Option D is incorrect as it does not represent the prime objective of risk management.");
 
-        frågorLista[75] = new Frågor("76. A business asset is best described by which of the following?",
+        frågorLista[73] = new Frågor("74. A business asset is best described by which of the following?",
                 new String[]{
                         "A. An asset loss that could cause a financial or operational impact to the organization",
                         "B. Controls put in place that reduce the effects of threats",
@@ -877,7 +934,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Personnel, compensation, and retirement programs"},
                 3, // Correct answer is C (Competitive advantage, capability, credibility, or goodwill)
                 "C. A business asset is best described as something that contributes to competitive advantage, capability, credibility, or goodwill. Options A, B, and D do not accurately describe a business asset.");
-        frågorLista[76] = new Frågor("77. Which is not accurate regarding the process of a risk assessment?",
+        frågorLista[74] = new Frågor("75. Which is not accurate regarding the process of a risk assessment?",
                 new String[]{
                         "A. The possibility that a threat exists must be determined as an element of the risk assessment.",
                         "B. The level of impact of a threat must be determined as an element of risk assessment.",
@@ -886,7 +943,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (A risk assessment is the last result of the risk management process)
                 "C. A risk assessment is not the last result of the risk management process but rather the first step in the process. Options A, B, and D are accurate regarding the process of a risk assessment.");
 
-        frågorLista[77] = new Frågor("78. Which statement is not correct about safeguard selection in the risk analysis process?",
+        frågorLista[75] = new Frågor("76. Which statement is not correct about safeguard selection in the risk analysis process?",
                 new String[]{
                         "A. Total cost of ownership (TCO) needs to be included in determining the total cost of the safeguard.",
                         "B. It is most common to consider the cost effectiveness of the safeguard.",
@@ -895,7 +952,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (The most effective safeguard should always be implemented regardless of cost)
                 "C. The statement in Option C is not correct because, in practice, the most effective safeguard is not always implemented without consideration of cost. Options A, B, and D are correct regarding safeguard selection in the risk analysis process.");
 
-        frågorLista[78] = new Frågor("79. Which option most accurately reflects the goals of risk mitigation?",
+        frågorLista[76] = new Frågor("77. Which option most accurately reflects the goals of risk mitigation?",
                 new String[]{
                         "A. Determining the effects of a denial of service and preparing the company’s response",
                         "B. The removal of all exposure and threats to the organization",
@@ -904,7 +961,7 @@ public class TentaController extends Application implements Initializable {
                 4, // Correct answer is D (Defining the acceptable level of risk the organization can tolerate and reducing risk to that level)
                 "D. The goal of risk mitigation is to define the acceptable level of risk that the organization can tolerate and take actions to reduce risk to that level. Option A refers to continuity management planning. Option B is generally impossible to achieve. Option C combines two different concepts, neither of which is a primary goal of risk mitigation.");
 
-        frågorLista[79] = new Frågor("80. Of the following choices which is not a typical monitoring technique?",
+        frågorLista[77] = new Frågor("78. Of the following choices which is not a typical monitoring technique?",
                 new String[]{
                         "A. Passive monitoring",
                         "B. Active monitoring",
@@ -913,7 +970,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Subjective monitoring)
                 "C. Subjective monitoring is not a typical monitoring technique. Options A, B, and D represent common monitoring techniques used within an organization.");
 
-        frågorLista[80] = new Frågor("81. Which option is not a risk treatment technique?",
+        frågorLista[78] = new Frågor("79. Which option is not a risk treatment technique?",
                 new String[]{
                         "A. Risk acceptance",
                         "B. Ignoring risk",
@@ -922,7 +979,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Ignoring risk)
                 "B. Ignoring risk is not a recognized risk treatment technique. If the risk is ignored, it is, by default, accepted. Options A, C, and D are typical risk treatment techniques.");
 
-        frågorLista[81] = new Frågor("82. Which of the following is not a control category?",
+        frågorLista[79] = new Frågor("80. Which of the following is not a control category?",
                 new String[]{
                         "A. Administrative",
                         "B. Physical",
@@ -930,7 +987,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Technical"},
                 3, // Correct answer is C (Preventative)
                 "C. While there are preventative controls, 'Preventative' is not one of the three major control categories. Options A, B, and D represent the three major control categories.");
-        frågorLista[83] = new Frågor("84. Which is the most volatile memory?",
+        frågorLista[80] = new Frågor("81. Which is the most volatile memory?",
                 new String[]{
                         "A. Hard disk",
                         "B. CPU cache",
@@ -939,7 +996,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (CPU cache)
                 "B. CPU cache is the most volatile memory as it is the closest memory to the CPU. Options A and D represent long-term storage and are not considered volatile memory. Option C, RAM, is volatile memory but not as volatile as CPU cache.");
 
-        frågorLista[84] = new Frågor("85. Which option provides the best description of the first action to take during incident response?",
+        frågorLista[81] = new Frågor("82. Which option provides the best description of the first action to take during incident response?",
                 new String[]{
                         "A. Determine the source and vector of the threat.",
                         "B. Follow the procedures in the incident response plan.",
@@ -948,7 +1005,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Follow the procedures in the incident response plan)
                 "B. The best first action during incident response is to follow the procedures outlined in the incident response plan. Options A, C, and D may be steps within the incident response plan but are not the very first action.");
 
-        frågorLista[85] = new Frågor("86. Which option most accurately describes continuity of operations after a disaster event?",
+        frågorLista[82] = new Frågor("83. Which option most accurately describes continuity of operations after a disaster event?",
                 new String[]{
                         "A. Controlling risk to the organization",
                         "B. Planned procedures that are performed when a security-related incident occurs",
@@ -957,7 +1014,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Planned activities that enable the organization's critical business functions to return to operations)
                 "C. Continuity of operations after a disaster event involves planned activities that enable the organization's critical business functions to return to normal operations. Option A is related to risk management, while Option B is part of incident response. Option D refers to risk transference, not continuity of operations.");
 
-        frågorLista[86] = new Frågor("87. When considering a disaster, which of the following is not a commonly accepted definition?",
+        frågorLista[83] = new Frågor("84. When considering a disaster, which of the following is not a commonly accepted definition?",
                 new String[]{
                         "A. An occurrence that is outside the normal functional baselines",
                         "B. An occurrence or imminent threat to the enterprise of widespread or severe damage, injury, loss of life, or loss of property",
@@ -966,7 +1023,7 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (An occurrence that is outside the normal functional baselines)
                 "A. Option A is not a commonly accepted definition of a disaster. Options B, C, and D are all commonly accepted definitions of disasters.");
 
-        frågorLista[87] = new Frågor("88. Which of the following is not an accurate statement about an organization's incident response policy?",
+        frågorLista[84] = new Frågor("85. Which of the following is not an accurate statement about an organization's incident response policy?",
                 new String[]{
                         "A. It should require the ability to respond quickly and effectively to an incident.",
                         "B. It should require the prevention of future damage from an incident.",
@@ -975,7 +1032,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (It should require the retaliation against repeat attackers)
                 "C. An organization's incident response policy should not require retaliation against repeat attackers. Options A, B, and D are all accurate statements about an organization's incident response policy.");
 
-        frågorLista[88] = new Frågor("89. Which option is not a responsibility of the person designated to manage the continuity planning process?",
+        frågorLista[85] = new Frågor("86. Which option is not a responsibility of the person designated to manage the continuity planning process?",
                 new String[]{
                         "A. Providing information and direction to senior management staff",
                         "B. Providing stress mitigation programs to employees after an asset loss event",
@@ -984,7 +1041,8 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Providing stress mitigation programs to employees after an asset loss event)
                 "B. Providing stress mitigation programs to employees after an asset loss event is typically the responsibility of the human resources department, not the person managing the continuity planning process. Options A, C, and D are all responsibilities of the person designated to manage continuity planning.");
 
-        frågorLista[89] = new Frågor("90. Which disaster recovery/emergency management plan testing type is considered the most cost-effective and efficient way to identify areas of overlap in the plan before conducting a more demanding training exercise?",
+        frågorLista[86] = new Frågor("87. Which disaster recovery/emergency management plan testing type is considered the most cost-effective and efficient " +
+                "way to identify areas of overlap in the plan before conducting a more demanding training exercise?",
                 new String[]{
                         "A. Full failover test",
                         "B. Structured walk-through test",
@@ -992,34 +1050,34 @@ public class TentaController extends Application implements Initializable {
                         "D. Bullet point test"},
                 3, // Correct answer is C (Tabletop exercise)
                 "C. A tabletop exercise is considered the most cost-effective and efficient way to identify areas of overlap in a disaster recovery/emergency management plan before conducting a more demanding training exercise. Options A, B, and D are other types of testing/exercise, but they are not as cost-effective for the purpose mentioned.");
-        frågorLista[90] = new Frågor("91. Which of the following options best describes a cold site?",
+        frågorLista[87] = new Frågor("88. Which of the following options best describes a cold site?",
                 new String[]{
                         "A. An alternate processing facility with established electrical wiring and HVAC but no data processing hardware",
                         "B. An alternate processing facility with most data processing hardware and software installed, which can be operational within a matter of hours to a few days",
                         "C. An alternate processing facility that has all hardware and software installed and is mirrored with the original site and can be operational within a very short period of time",
                         "D. A mobile trailer with portable generators and air-conditioning"},
-                0, // Correct answer is A (An alternate processing facility with established electrical wiring and HVAC but no data processing hardware)
+                1, // Correct answer is A (An alternate processing facility with established electrical wiring and HVAC but no data processing hardware)
                 "A. A cold site is an alternate processing facility with established electrical wiring and HVAC but no data processing hardware. Options B, C, and D describe other types of alternate sites with varying degrees of readiness.");
 
-        frågorLista[91] = new Frågor("92. Which of the following statements is an incorrect description of a control?",
+        frågorLista[88] = new Frågor("89. Which of the following statements is an incorrect description of a control?",
                 new String[]{
                         "A. Detective controls monitor for attacks and instigate preventative or corrective controls.",
                         "B. Controls reduce the possibility that vulnerabilities will be attacked.",
                         "C. The effect of an attack is reduced through the use of controls",
                         "D. Restorative controls reduce the likelihood of a deliberate attack."},
-                3, // Correct answer is D (Restorative controls reduce the likelihood of a deliberate attack)
+                4, // Correct answer is D (Restorative controls reduce the likelihood of a deliberate attack)
                 "D. Restorative controls do not typically reduce the likelihood of a deliberate attack. Options A, B, and C are accurate descriptions of controls.");
 
-        frågorLista[92] = new Frågor("93. Which of the five disaster recovery testing types creates the most risk for the enterprise?",
+        frågorLista[89] = new Frågor("90. Which of the five disaster recovery testing types creates the most risk for the enterprise?",
                 new String[]{
                         "A. Simulation",
                         "B. Parallel",
                         "C. Structured walk-through",
                         "D. Full interruption"},
-                3, // Correct answer is D (Full interruption)
+                4, // Correct answer is D (Full interruption)
                 "D. A full interruption test creates the most risk for the enterprise as it involves a complete shutdown of the primary system. Options A, B, and C are other types of disaster recovery testing but involve varying degrees of risk.");
 
-        frågorLista[93] = new Frågor("94. Which of the following options would require the longest setup time?",
+        frågorLista[90] = new Frågor("91. Which of the following options would require the longest setup time?",
                 new String[]{
                         "A. Mobile or portable alternate IT computing service",
                         "B. Hot site",
@@ -1028,24 +1086,25 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (Mobile or portable alternate IT computing service)
                 "A. A mobile or portable alternate IT computing service would typically require the longest setup time, as it involves mobilizing resources. Options B, C, and D represent different types of alternate recovery sites with varying levels of readiness.");
 
-        frågorLista[94] = new Frågor("95. A backup site is best described by which of the following options?",
+        frågorLista[91] = new Frågor("92. A backup site is best described by which of the following options?",
                 new String[]{
                         "A. A computer facility with electrical power and HVAC but with no applications or installed data on the workstations or servers prior to the event",
                         "B. A computer facility with available electrical power and HVAC and some print/file servers. No equipment has been installed at the site.",
                         "C. An alternate computing location with little power and air-conditioning but no telecommunications capability",
                         "D. A computer facility with power and HVAC and all servers and communications. All applications are ready to be installed and configured, and recent data is available to be restored to the site."},
-                3, // Correct answer is D (A computer facility with power and HVAC and all servers and communications. All applications are ready to be installed and configured, and recent data is available to be restored to the site.)
+                4, // Correct answer is D (A computer facility with power and HVAC and all servers and communications. All applications are ready to be
+                // installed and configured, and recent data is available to be restored to the site.)
                 "D. A backup site is best described as a computer facility with power and HVAC, all servers and communications, and all applications ready to be installed and configured. Recent data is also available to be restored to the site. Options A, B, and C describe other types of alternate recovery sites.");
 
-        frågorLista[95] = new Frågor("96. What is the prime objective of the continuity plan?",
+        frågorLista[92] = new Frågor("93. What is the prime objective of the continuity plan?",
                 new String[]{
                         "A. To make sure everyone understands their responsibility and the procedures they must follow",
                         "B. To inform everyone that a disaster or incident event has occurred",
                         "C. To maintain business operations, as best as possible, until all operations can be restored",
                         "D. To rebuild the facility after a disaster occurrence"},
-                2, // Correct answer is C (To maintain business operations, as best as possible, until all operations can be restored)
+                3, // Correct answer is C (To maintain business operations, as best as possible, until all operations can be restored)
                 "C. The prime objective of the continuity plan is to maintain business operations as best as possible until all operations can be restored. Options A, B, and D are not the primary objectives of the continuity plan.");
-        frågorLista[96] = new Frågor("97. Which option best describes an incremental backup?",
+        frågorLista[93] = new Frågor("94. Which option best describes an incremental backup?",
                 new String[]{
                         "A. Daily backups are appended to previous backups.",
                         "B. Daily backups are maintained in separate files.",
@@ -1054,7 +1113,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Daily backups are maintained in separate files)
                 "B. An incremental backup stores only the current day’s data in a file. Options A, C, and D are backup techniques but are not defined as incremental backups.");
 
-        frågorLista[97] = new Frågor("98. Which option is most accurate regarding a recovery point objective?",
+        frågorLista[94] = new Frågor("95. Which option is most accurate regarding a recovery point objective?",
                 new String[]{
                         "A. The time after which the viability of the enterprise is in question",
                         "B. The point at which the most accurate data is available for restoration",
@@ -1063,7 +1122,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (The point at which the most accurate data is available for restoration)
                 "B. The RPO is the location of the most accurate backup data prior to a disaster event. Options A, C, and D are distractors.");
 
-        frågorLista[98] = new Frågor("99. Which team is made up of members from across the enterprise?",
+        frågorLista[95] = new Frågor("96. Which team is made up of members from across the enterprise?",
                 new String[]{
                         "A. Dedicated full-time incident response team",
                         "B. Functional incident response team",
@@ -1072,7 +1131,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Functional incident response team)
                 "B. The functional incident response team should consist of a broad range of talents from across the organization. Options A, C, and D, although types of incident response teams, usually featured experts, dedicated personnel, or third-party contractors.");
 
-        frågorLista[99] = new Frågor("100. Evidence should be tracked utilizing which of the following methods?",
+        frågorLista[96] = new Frågor("97. Evidence should be tracked utilizing which of the following methods?",
                 new String[]{
                         "A. Record of evidence",
                         "B. Chain of custody",
@@ -1081,7 +1140,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Chain of custody)
                 "B. The chain of custody involves logging the location and handling of evidence. Options A, C, and D are items that may be used during investigation.");
 
-        frågorLista[100] = new Frågor("101. Prior to analysis, data should be copied from a hard disk utilizing which of the following?",
+        frågorLista[97] = new Frågor("98. Prior to analysis, data should be copied from a hard disk utilizing which of the following?",
                 new String[]{
                         "A. Write protect tool",
                         "B. Block data copy software",
@@ -1090,7 +1149,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Bit data copy software)
                 "C. Data should be copied from a hard disk using bit-by-bit copy software. Options A, B, and D are distractors.");
 
-        frågorLista[101] = new Frågor("102. Upon arriving at an incident scene, the incident response team should do which of the following?",
+        frågorLista[98] = new Frågor("99. Upon arriving at an incident scene, the incident response team should do which of the following?",
                 new String[]{
                         "A. Turn off the affected machine to stop the attack.",
                         "B. Follow the procedures specified in the incident response plan.",
@@ -1099,7 +1158,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Follow the procedures specified in the incident response plan)
                 "B. First responders should always follow the procedures as specified in the incident response plan. Options A, C, and D may be procedures included in an incident response plan but are incorrect because they might not be the correct procedures in this organization’s incident response plan.");
 
-        frågorLista[102] = new Frågor("103. A clipping level does which of the following?",
+        frågorLista[99] = new Frågor("100. A clipping level does which of the following?",
                 new String[]{
                         "A. Reduces noise signals on the IT infrastructure",
                         "B. Removes unwanted packets",
@@ -1107,7 +1166,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Provides real-time monitoring"},
                 3, // Correct answer is C (Defines a threshold of activity that, after crossed, sets off an operator alarm or alert)
                 "C. It is a level at which an operator is alerted. Options A, B, and D are distractors.");
-        frågorLista[103] = new Frågor("104. Encapsulation provides what type of action?",
+        frågorLista[100] = new Frågor("101. Encapsulation provides what type of action?",
                 new String[]{
                         "A. Ensures perfect forward secrecy with IPsec",
                         "B. Places one type of packet inside another",
@@ -1116,7 +1175,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Provides for data integrity)
                 "C. The purpose of a hashing algorithm is to provide integrity. The message is hashed at each end of the transmission, and if the hash is equal, the message did not change. Options A, B, and C are incorrect because they have nothing to do with a hashing algorithm.");
 
-        frågorLista[104] = new Frågor("105. The OSI model features how many layers?",
+        frågorLista[101] = new Frågor("102. The OSI model features how many layers?",
                 new String[]{
                         "A. Six",
                         "B. Seven",
@@ -1125,7 +1184,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Seven)
                 "B. The OSI model consists of seven layers.");
 
-        frågorLista[105] = new Frågor("106. Which of the following offers the highest bandwidth and fiber-optic transmissions?",
+        frågorLista[102] = new Frågor("103. Which of the following offers the highest bandwidth and fiber-optic transmissions?",
                 new String[]{
                         "A. Single-mode",
                         "B. Dual-mode",
@@ -1134,7 +1193,7 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (Single-mode)
                 "A. Single-mode fiber-optic offers the highest bandwidth.");
 
-        frågorLista[106] = new Frågor("107. The address space for IPv6 is how many bits?",
+        frågorLista[103] = new Frågor("104. The address space for IPv6 is how many bits?",
                 new String[]{
                         "A. 144 bits",
                         "B. 132 bits",
@@ -1143,7 +1202,7 @@ public class TentaController extends Application implements Initializable {
                 4, // Correct answer is D (128 bits)
                 "D. IPv6 uses a 128-bit address space.");
 
-        frågorLista[107] = new Frågor("108. Switches operate at layer 2 on the OSI model and route what type of information?",
+        frågorLista[104] = new Frågor("105. Switches operate at layer 2 on the OSI model and route what type of information?",
                 new String[]{
                         "A. HMAC addresses",
                         "B. IP addresses",
@@ -1152,7 +1211,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (MAC addresses)
                 "C. Switches operate at layer 2 of the OSI model and route based on MAC addresses.");
 
-        frågorLista[108] = new Frågor("109. Which of the following protocols is referred to as connection oriented?",
+        frågorLista[105] = new Frågor("106. Which of the following protocols is referred to as connection oriented?",
                 new String[]{
                         "A. TCP",
                         "B. UDP",
@@ -1161,7 +1220,7 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (TCP)
                 "A. TCP (Transmission Control Protocol) is a connection-oriented protocol.");
 
-        frågorLista[109] = new Frågor("110. The most redundancy and connection speed is offered by which of the following network typology?",
+        frågorLista[106] = new Frågor("107. The most redundancy and connection speed is offered by which of the following network typology?",
                 new String[]{
                         "A. Ring",
                         "B. Tree",
@@ -1169,7 +1228,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Star"},
                 3, // Correct answer is C (Mesh)
                 "C. A mesh network topology offers the most redundancy and connection speed.");
-        frågorLista[110] = new Frågor("111. In a private enterprise environment, which of the following is most secure?",
+        frågorLista[107] = new Frågor("108. In a private enterprise environment, which of the following is most secure?",
                 new String[]{
                         "A. Decentralized key management",
                         "B. Centralized key management",
@@ -1178,7 +1237,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Centralized key management)
                 "B. In a private enterprise environment, centralized key management is often considered more secure as it allows for better control and management of keys.");
 
-        frågorLista[111] = new Frågor("112. Which of the following media access methods features a node broadcasting a tone prior to transmitting?",
+        frågorLista[108] = new Frågor("109. Which of the following media access methods features a node broadcasting a tone prior to transmitting?",
                 new String[]{
                         "A. CSMA/CT",
                         "B. CSMA/CD",
@@ -1187,7 +1246,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (CSMA/CA)
                 "C. CSMA/CA (Carrier Sense Multiple Access with Collision Avoidance) features a node broadcasting a tone prior to transmitting.");
 
-        frågorLista[112] = new Frågor("113. Which of the following best describes converged network communications?",
+        frågorLista[109] = new Frågor("110. Which of the following best describes converged network communications?",
                 new String[]{
                         "A. The combination of two types of media such as copper and fiber-optic",
                         "B. The use of Ethernet when communicating on a wireless network",
@@ -1196,7 +1255,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Transmission of voice and media files over a network)
                 "C. Converged network communications refer to the transmission of voice and media files over a network.");
 
-        frågorLista[113] = new Frågor("114. Continuous monitoring is best defined by which of the following?",
+        frågorLista[110] = new Frågor("111. Continuous monitoring is best defined by which of the following?",
                 new String[]{
                         "A. An automated system that regulates the flow of traffic on a network",
                         "B. An automated system used to detect humidity and condensation in a data center",
@@ -1205,7 +1264,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (A method of monitoring that is used to detect risk issues within an organization)
                 "C. Continuous monitoring is a method used to detect risk issues within an organization.");
 
-        frågorLista[114] = new Frågor("115. Which of the following best describes Kerberos?",
+        frågorLista[111] = new Frågor("112. Which of the following best describes Kerberos?",
                 new String[]{
                         "A. A federation of third-party suppliers that use a single sign-on",
                         "B. An authentication, single sign-on protocol",
@@ -1214,7 +1273,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (An authentication, single sign-on protocol)
                 "B. Kerberos is an authentication and single sign-on protocol.");
 
-        frågorLista[115] = new Frågor("116. Which type of network device is used to create a virtual local area network?",
+        frågorLista[112] = new Frågor("113. Which type of network device is used to create a virtual local area network?",
                 new String[]{
                         "A. A router",
                         "B. NIC cards in promiscuous mode",
@@ -1223,7 +1282,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (A switch)
                 "C. A switch is used to create a virtual local area network (VLAN).");
 
-        frågorLista[116] = new Frågor("117. Which choice best describes a federation?",
+        frågorLista[113] = new Frågor("114. Which choice best describes a federation?",
                 new String[]{
                         "A. Organizations that may rely on each other in the event of a disaster event",
                         "B. An association of nonrelated third-party organizations that share information based upon a single sign-on",
@@ -1231,7 +1290,7 @@ public class TentaController extends Application implements Initializable {
                         "D. A single sign-on technique that allows nonrelated third-party organizations access to network resources"},
                 2, // Correct answer is B (An association of nonrelated third-party organizations that share information based upon a single sign-on)
                 "B. A federation is an association of nonrelated third-party organizations that share information based upon a single sign-on.");
-        frågorLista[117] = new Frågor("118. Which answer is most accurate regarding firewalls?",
+        frågorLista[114] = new Frågor("115. Which answer is most accurate regarding firewalls?",
                 new String[]{
                         "A. They route traffic based upon inspecting packets.",
                         "B. They filter traffic based upon inspecting packets.",
@@ -1240,7 +1299,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (They filter traffic based upon inspecting packets)
                 "B. Firewalls filter traffic based upon inspecting packets.");
 
-        frågorLista[118] = new Frågor("119. Which answer is most accurate regarding a wireless intrusion prevention system?",
+        frågorLista[115] = new Frågor("116. Which answer is most accurate regarding a wireless intrusion prevention system?",
                 new String[]{
                         "A. It is used to fine-tune the traffic on a wireless network.",
                         "B. Rogue access points are detected.",
@@ -1249,7 +1308,7 @@ public class TentaController extends Application implements Initializable {
                 4, // Correct answer is D (It monitors all traffic arriving at a wireless access point for proper ID fields)
                 "D. A wireless intrusion prevention system (WIPS) monitors all traffic arriving at a wireless access point for proper ID fields.");
 
-        frågorLista[119] = new Frågor("120. Which answer is most accurate regarding IEEE 802.11i?",
+        frågorLista[116] = new Frågor("117. Which answer is most accurate regarding IEEE 802.11i?",
                 new String[]{
                         "A. Provides 54 Mbit/s using the 2.4 GHz frequency spectrum",
                         "B. Provides security enhancements using WPA2",
@@ -1258,7 +1317,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Provides security enhancements using WPA2)
                 "B. IEEE 802.11i provides security enhancements using WPA2.");
 
-        frågorLista[120] = new Frågor("121. Which choice best describes Bluetooth?",
+        frågorLista[117] = new Frågor("118. Which choice best describes Bluetooth?",
                 new String[]{
                         "A. A secure transmission methodology",
                         "B. A transmission tool used to back up hard disks",
@@ -1267,7 +1326,9 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (A method of data synchronization between devices)
                 "C. Bluetooth is a method of data synchronization between devices.");
 
-        frågorLista[121] = new Frågor("122. Which of the following is a term used for a rogue Wi-Fi access point that appears to be legitimate but actually has been set up to intercept wireless communications?",
+        frågorLista[118] = new Frågor("119. Which of the following is a term used for a rogue Wi-Fi access point that appears to be legitimate but actually " +
+                "has" +
+                " been set up to intercept wireless communications?",
                 new String[]{
                         "A. Captive access point",
                         "B. Evil twin",
@@ -1276,7 +1337,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Evil twin)
                 "B. An 'Evil twin' is a term used for a rogue Wi-Fi access point that appears to be legitimate but is set up to intercept wireless communications.");
 
-        frågorLista[122] = new Frågor("123. For optimal signal quality, which of the following is correct concerning wireless antenna placement?",
+        frågorLista[119] = new Frågor("120. For optimal signal quality, which of the following is correct concerning wireless antenna placement?",
                 new String[]{
                         "A. Always use a Yagi antenna for 360° broadcasts.",
                         "B. Place the antenna near a doorway facing into a room.",
@@ -1284,7 +1345,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Wireless antennas must always be placed in the line of sight."},
                 3, // Correct answer is C (Place the antenna as high as possible in the center of the service area)
                 "C. For optimal signal quality, it's best to place the antenna as high as possible in the center of the service area.");
-        frågorLista[123] = new Frågor("124. Which of the following is the most likely to attack using an advanced persistent threat?",
+        frågorLista[120] = new Frågor("121. Which of the following is the most likely to attack using an advanced persistent threat?",
                 new String[]{
                         "A. Hacker",
                         "B. Nation state",
@@ -1293,7 +1354,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Nation state)
                 "B. An advanced persistent threat is a type of cyber terrorism malware usually placed by a well-funded, country-sponsored cyber-attack group.");
 
-        frågorLista[124] = new Frågor("125. Which of the following options best describes a hacker with an agenda?",
+        frågorLista[121] = new Frågor("122. Which of the following options best describes a hacker with an agenda?",
                 new String[]{
                         "A. Cracker",
                         "B. Nation state",
@@ -1302,7 +1363,7 @@ public class TentaController extends Application implements Initializable {
                 4, // Correct answer is D (Hacktivist)
                 "D. A hacktivist has a political, social, or personal agenda.");
 
-        frågorLista[125] = new Frågor("126. Which statement most accurately describes a virus?",
+        frågorLista[122] = new Frågor("123. Which statement most accurately describes a virus?",
                 new String[]{
                         "A. It divides itself into many small pieces inside a PC.",
                         "B. It always attacks an email contacts list.",
@@ -1311,7 +1372,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (It requires an outside action in order to replicate)
                 "C. A virus always requires an outside action in order to replicate.");
 
-        frågorLista[126] = new Frågor("127. Which option is not a commonly accepted definition for a script kiddie?",
+        frågorLista[123] = new Frågor("124. Which option is not a commonly accepted definition for a script kiddie?",
                 new String[]{
                         "A. A young unskilled hacker",
                         "B. A young inexperienced hacker",
@@ -1320,7 +1381,7 @@ public class TentaController extends Application implements Initializable {
                 4, // Correct answer is D (A highly skilled attacker)
                 "D. All of the other options describe a typical script kiddie.");
 
-        frågorLista[127] = new Frågor("128. Which choice describes the path of an attack?",
+        frågorLista[124] = new Frågor("125. Which choice describes the path of an attack?",
                 new String[]{
                         "A. A threat vector",
                         "B. A threat source location",
@@ -1329,7 +1390,7 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (A threat vector)
                 "A. A threat vector describes the path of an attack.");
 
-        frågorLista[128] = new Frågor("129. Which choice best describes a zombie?",
+        frågorLista[125] = new Frågor("126. Which choice best describes a zombie?",
                 new String[]{
                         "A. Malware that logs keystrokes",
                         "B. A member of a botnet",
@@ -1338,7 +1399,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (A member of a botnet)
                 "B. A member of a botnet is referred to as a bot or a zombie computer.");
 
-        frågorLista[129] = new Frågor("130. Which answer best describes an advanced persistent threat?",
+        frågorLista[126] = new Frågor("127. Which answer best describes an advanced persistent threat?",
                 new String[]{
                         "A. Advanced malware attack by a persistent hacker",
                         "B. A malware attack by a nation state",
@@ -1346,7 +1407,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Malware that persistently moves from one place to another"},
                 2, // Correct answer is B (A malware attack by a nation state)
                 "B. An APT is malware usually put in place by a nation state.");
-        frågorLista[130] = new Frågor("131. Which choice is the most accurate description of a retrovirus?",
+        frågorLista[127] = new Frågor("128. Which choice is the most accurate description of a retrovirus?",
                 new String[]{
                         "A. A virus designed several years ago",
                         "B. A virus that attacks anti-malware software",
@@ -1355,7 +1416,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (A virus that attacks anti-malware software)
                 "B. A retrovirus attacks anti-malware software and sometimes disables a signature library or simply turns off the detection mechanism.");
 
-        frågorLista[131] = new Frågor("132. Which choice is an attack on a senior executive?",
+        frågorLista[128] = new Frågor("129. Which choice is an attack on a senior executive?",
                 new String[]{
                         "A. Phishing attack",
                         "B. Whaling attack",
@@ -1364,7 +1425,8 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Whaling attack)
                 "B. A whaling attack targets a senior executive to get them to click a link in an email in order to infect their computer.");
 
-        frågorLista[132] = new Frågor("133. Which of the following is most often used as a term to describe an attack that makes use of a previously unknown vulnerability?",
+        frågorLista[129] = new Frågor("130. Which of the following is most often used as a term to describe an attack that makes use of a previously unknown " +
+                "vulnerability?",
                 new String[]{
                         "A. Discovery attack",
                         "B. First use attack",
@@ -1373,7 +1435,7 @@ public class TentaController extends Application implements Initializable {
                 4, // Correct answer is D (Zero-day attack)
                 "D. A zero-day attack refers to a type of attack in which the attacker uses a previously unknown attack technique or exploits a previously unknown vulnerability.");
 
-        frågorLista[133] = new Frågor("134. Which type of client-side program always runs in a sandbox?",
+        frågorLista[130] = new Frågor("131. Which type of client-side program always runs in a sandbox?",
                 new String[]{
                         "A. HTML4 control",
                         "B. Visual Basic script",
@@ -1382,7 +1444,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Java applet)
                 "C. By design, Java always creates a sandbox in which to execute an applet on a client machine. This prohibits the applet from being able to attack either the host machine or an application.");
 
-        frågorLista[134] = new Frågor("135. Which of the following would best describe the purpose of a trusted platform module?",
+        frågorLista[131] = new Frågor("132. Which of the following would best describe the purpose of a trusted platform module?",
                 new String[]{
                         "A. A module that verifies the authenticity of a guest host",
                         "B. The part of the operating system that must be invoked all the time and is referred to as a security kernel",
@@ -1391,7 +1453,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (A dedicated microprocessor that offloads cryptographic processing from the CPU while storing cryptographic keys)
                 "C. The trusted platform module is a crypto processor that performs as a dedicated micro- processor of cryptographic algorithms.");
 
-        frågorLista[135] = new Frågor("136. What is the prime objective of code signing?",
+        frågorLista[132] = new Frågor("133. What is the prime objective of code signing?",
                 new String[]{
                         "A. To verify the author and integrity of downloadable code that is signed using a private key",
                         "B. To verify the author and integrity of downloadable code that is signed using a public key",
@@ -1400,7 +1462,7 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (To verify the author and integrity of downloadable code that is signed using a private key)
                 "A. A private key is owned by the author and is used to encrypt the message digest or hash value of the code. The hash value provides the integrity, and the private key provides a digi- tal signature and nonrepudiation by the author. The author’s public key, usually provided in a digital certificate, is the only key that will decrypt the hash value.");
 
-        frågorLista[136] = new Frågor("137. Which choice least describes a cloud implementation?",
+        frågorLista[133] = new Frågor("134. Which choice least describes a cloud implementation?",
                 new String[]{
                         "A. Broadly assessable by numerous networking platforms",
                         "B. Rapid elasticity",
@@ -1408,7 +1470,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Inexpensive"},
                 4, // Correct answer is D (Inexpensive)
                 "D. The cloud is a metering, measured service similar to a utility, sometimes referred to as a “pay as you go” model. At this point, cloud services are still fairly expensive compared to installing one more disk drive in an organization’s server.");
-        frågorLista[137] = new Frågor("138. Which option is not a cloud deployment model?",
+        frågorLista[134] = new Frågor("135. Which option is not a cloud deployment model?",
                 new String[]{
                         "A. Private cloud",
                         "B. Corporate cloud",
@@ -1417,7 +1479,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (Corporate cloud)
                 "B. According to NIST Special Publication 800-145, “The NIST Definition of Cloud Com- puting,” a corporate cloud is not a cloud deployment model. Corporate cloud and private cloud refer to the same thing.");
 
-        frågorLista[138] = new Frågor("139. Which of the following options is not a standard cloud service model?",
+        frågorLista[135] = new Frågor("136. Which of the following options is not a standard cloud service model?",
                 new String[]{
                         "A. Help Desk as a Service",
                         "B. Software as a Service",
@@ -1426,7 +1488,7 @@ public class TentaController extends Application implements Initializable {
                 1, // Correct answer is A (Help Desk as a Service)
                 "A. Help Desk as a Service is not one of the NIST-listed cloud service models, although it is a service that might be offered over the cloud.");
 
-        frågorLista[139] = new Frågor("140. Which of the following is the most accurate statement?",
+        frågorLista[136] = new Frågor("137. Which of the following is the most accurate statement?",
                 new String[]{
                         "A. Any corporation that has done business in the European Union in excess of five years may apply for the Safe Harbor amendment.",
                         "B. Argentina and Brazil are members of the Asia-Pacific Privacy Pact.",
@@ -1435,7 +1497,7 @@ public class TentaController extends Application implements Initializable {
                 4, // Correct answer is D (The European Union’s General Data Protection Regulation provides a single set of rules for all member states)
                 "D. The General Data Protection Regulation, which superseded Directive 95/46 BC, requires that all member states abide by the legal principles in the regulation and that these principles are not arbitrary.");
 
-        frågorLista[140] = new Frågor("141. Which of the following most accurately describes eDiscovery:",
+        frågorLista[137] = new Frågor("138. Which of the following most accurately describes eDiscovery:",
                 new String[]{
                         "A. Any information put on legal hold",
                         "B. A legal tool used to request suspected evidentiary information that may be used in litigation",
@@ -1444,7 +1506,7 @@ public class TentaController extends Application implements Initializable {
                 2, // Correct answer is B (A legal tool used to request suspected evidentiary information that may be used in litigation)
                 "B. eDiscovery is a legal tool used by opposing counsel to obtain requested information that may contain evidence or other useful information for a lawsuit. eDiscovery is not the infor- mation itself. It is the process of obtaining the information.");
 
-        frågorLista[141] = new Frågor("142. Which of the following is most accurate concerning virtualization security?",
+        frågorLista[138] = new Frågor("139. Which of the following is most accurate concerning virtualization security?",
                 new String[]{
                         "A. Only hypervisors can be secured, not the underlying virtual machine.",
                         "B. Virtual machines are only secured by securing the underlying hardware infrastructure.",
@@ -1453,7 +1515,7 @@ public class TentaController extends Application implements Initializable {
                 3, // Correct answer is C (Virtual machines can be secured as well as the hypervisor and underlying hardware infrastructure)
                 "C. Security controls may be placed anywhere in a virtual environment. Security in depth is always the best practice when securing any environment.");
 
-        frågorLista[142] = new Frågor("143. Which of the following is most accurate concerning data warehousing and big data architecture?",
+        frågorLista[139] = new Frågor("140. Which of the following is most accurate concerning data warehousing and big data architecture?",
                 new String[]{
                         "A. Data warehouses are used for long-term storage of archive data.",
                         "B. Data is processed using auto-synthesis to enhance processing speed.",
@@ -1463,7 +1525,9 @@ public class TentaController extends Application implements Initializable {
                 "C. Several big data processing models exist that illustrate how big data can be processed by parallel processors reaching into the thousands of servers.");
         //kapitel 3 Under
 
-        Poäng.setText("Poäng: " + poäng + "/" + frågorLista.length);
+         */
+
+        Poäng.setText("Poäng: " + poäng + "/" + frågorLista.size());
         setText();
         setKnappar();
 
