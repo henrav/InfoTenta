@@ -106,47 +106,23 @@ public class TentaController extends Application implements Initializable {
         poäng++;
         Poäng.setText("Poäng: " + poäng + "/" + frågorLista.size());
     }
-    public void setKnappar(){
-        KnappSvar1.setOnAction(actionEvent -> {
-            if (currentFråga.getCorrectAnswer() == 1) {
-                System.out.println("Rätt svar");
-                poäng();
-                nästaFråga();
-            } else {
-                System.out.println("Fel svar");
-                showWrongAnswer();
-            }
-        });
-        KnappSvar2.setOnAction(actionEvent -> {
-            if (currentFråga.getCorrectAnswer() == 2) {
-                System.out.println("Rätt svar");
-                poäng();
-                nästaFråga();
-            } else {
-                System.out.println("Fel svar");
-                showWrongAnswer();
-            }
-        });
-        KnappSvar3.setOnAction(actionEvent -> {
-            if (currentFråga.getCorrectAnswer() == 3) {
-                System.out.println("Rätt svar");
-                poäng();
-                nästaFråga();
-            } else {
-                System.out.println("Fel svar");
-                showWrongAnswer();
-            }
-        });
-        KnappSvar4.setOnAction(actionEvent -> {
-            if (currentFråga.getCorrectAnswer() == 4) {
-                System.out.println("Rätt svar");
-                poäng();
-                nästaFråga();
-            } else {
-                System.out.println("Fel svar");
-                showWrongAnswer();
-            }
-        });
+    public void setKnappar() {
+        Button[] answerButtons = {KnappSvar1, KnappSvar2, KnappSvar3, KnappSvar4};
+
+        for (int i = 0; i < answerButtons.length; i++) {
+            int answerIndex = i + 1; // Answers are 1-based
+
+            answerButtons[i].setOnAction(actionEvent -> {
+                if (currentFråga.getCorrectAnswer() == answerIndex) {
+                    System.out.println("Rätt svar");
+                    poäng();
+                    nästaFråga();
+                } else {
+                    System.out.println("Fel svar");
+                    showWrongAnswer();
+                }
+            });
+        }
     }
     public void tillBaka(){
         if (currentFrågaIndex > 0) {
@@ -177,30 +153,11 @@ public class TentaController extends Application implements Initializable {
     public void seeAnswer(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Förklaring");
-        alert.setHeaderText("Rätta Svaret är: " + convertnrIntoABC(currentFråga));
+        alert.setHeaderText("Rätta Svaret är: " + currentFråga.getCorrectAnswer());
         alert.setContentText(currentFråga.getExplanation());
         alert.showAndWait();
     }
-    public String convertnrIntoABC(Frågor fråga){
-        int a = currentFråga.getCorrectAnswer();
-        if (a == 1){
-            setKnappSvar1("A");
-            return "A";
-        }
-        if (a == 2){
-            setKnappSvar2("B");
-            return "B";
-        }
-        if (a == 3){
-            setKnappSvar3("C");
-            return "C";
-        }
-        if (a == 4){
-            setKnappSvar4("D");
-            return "D";
-        }
-        return null;
-    }
+
 
 
     public void nästaFråga(){
@@ -243,17 +200,17 @@ public class TentaController extends Application implements Initializable {
 
     public void setText(){
         currentFråga = frågorLista.get(currentFrågaIndex);
+        currentFråga.shuffleAnswers();
         setFrågaText(currentFråga.getQuestionText());
         setSvarAlternativText1(currentFråga.getAlternativText()[0]);
         setSvarAlternativText2(currentFråga.getAlternativText()[1]);
         setSvarAlternativText3(currentFråga.getAlternativText()[2]);
         setSvarAlternativText4(currentFråga.getAlternativText()[3]);
         setFrågaNR("Fråga " + (currentFrågaIndex + 1) + " av " + frågorLista.size());
-        setKnappSvar1("A");
-        setKnappSvar2("B");
-        setKnappSvar3("C");
-        setKnappSvar4("D");
-
+        setKnappSvar1("OK");
+        setKnappSvar2("OK");
+        setKnappSvar3("OK");
+        setKnappSvar4("OK");
     }
 
     @Override
@@ -271,6 +228,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Designing applications that do not have high levels of privilege"},
                 3,
                 "The definition of the principle of least privilege is granting users only the minimum privileges needed to accomplish assigned work tasks."));
+
         frågorLista.add(new Frågor("What is the process of assigning groups of tasks to different users to prevent collusion and avoid conflicts of interest?",
                 new String[]{
                         "A. Principle of least privilege",
@@ -344,7 +302,7 @@ public class TentaController extends Application implements Initializable {
                         "D. Using an alternate site after a disaster"},
                 3,
                 "Use of an alternate site after a disaster falls under the recovery primary security category."));
-        /*
+
 
         frågorLista.add(new Frågor("What is the most important step the IT department should take when an employee is fired?",
                 new String[]{
@@ -1656,7 +1614,6 @@ public class TentaController extends Application implements Initializable {
                 "C. Several big data processing models exist that illustrate how big data can be processed by parallel processors reaching into the thousands of servers."));
         //kapitel 3 Under
 
-         */
 
 
 
